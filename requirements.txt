@@ -1,0 +1,7 @@
+Flask==3.0.3
+mysql-connector-python
+scikit-learn
+numpy
+pandas
+matplotlib
+seaborn
