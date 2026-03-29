@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Sales - Inventory System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Stats Cards -->
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm border-0 h-100 text-center bg-primary text-white">
+            <div class="card-body p-4">
+                <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                <h3>{{ sales_list|length }}</h3>
+                <p class="mb-0">Total Sales</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm border-0 h-100 text-center bg-success text-white">
+            <div class="card-body p-4">
+                <i class="fas fa-dollar-sign fa-3x mb-3"></i>
+                <h3>₹{{ "%.2f"|format(sales_list|sum(attribute='total')) if sales_list else '0.00' }}</h3>
+                <p class="mb-0">Total Revenue</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Record Sale Card -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-light">
+                <h5><i class="fas fa-plus-circle me-2"></i>Record New Sale</h5>
+            </div>
+            <form method="POST" action="{{ url_for('sales_page') }}">
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Product</label>
+                            <select class="form-select" name="product_id" required>
+                                <option value="">Select Product</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}" data-stock="{{ product.stock }}" data-price="{{ product.price }}">
+                                    {{ product.name }} (Stock: {{ product.stock }}, ₹{{ "%.2f"|format(product.price) }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" class="form-control" name="qty" min="1" required>
+                        </div>
+                        <div class="col-md-3 mb-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-cart-plus me-2"></i>Record Sale
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Sales History Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="table-container">
+            <h2><i class="fas fa-history me-2"></i>Sales History</h2>
+            {% if sales_list %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in sales_list|reverse %}
+                        <tr>
+                            <td>{{ sale.id }}</td>
+                            <td>{{ sale.product_name }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ sale.qty }}</span>
+                            </td>
+                            <td><strong>₹{{ "%.2f"|format(sale.total) }}</strong></td>
+                            <td>{{ sale.timestamp }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-5x text-muted mb-3"></i>
+                <h4>No sales recorded yet.</h4>
+                <p class="text-muted">Record your first sale above!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelector('select[name="product_id"]').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    if (selectedOption.value) {
+        console.log('Stock:', selectedOption.dataset.stock);
+    }
+});
+</script>
+{% endblock %}

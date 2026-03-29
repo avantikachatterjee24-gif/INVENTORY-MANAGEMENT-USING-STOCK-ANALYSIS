@@ -1,0 +1,154 @@
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.card {
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important;
+}
+
+.card-body h2 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+/* Dashboard analytics cards */
+.bg-success {
+    background: linear-gradient(135deg, #28a745, #20c997) !important;
+}
+.bg-primary {
+    background: linear-gradient(135deg, #007bff, #6610f2) !important;
+}
+.bg-warning {
+    background: linear-gradient(135deg, #ffc107, #fd7e14) !important;
+    color: #212529 !important;
+}
+.bg-danger {
+    background: linear-gradient(135deg, #dc3545, #c82333) !important;
+}
+
+.btn {
+    border-radius: 25px;
+    padding: 10px 30px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+}
+
+/* Products table styles */
+.table-container {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.table th {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    font-weight: 600;
+    border: none;
+}
+
+.table td {
+    vertical-align: middle;
+    border-color: #eee;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9ff;
+}
+
+.btn-sm {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2px;
+}
+
+/* Modal styles */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.form-control, .form-control:focus {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    box-shadow: none;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+}
+
+.bg-purple {
+    background: linear-gradient(45deg, #8e44ad, #9b59b6) !important;
+}
+
+/* Chart styling */
+.chart-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-top: 1rem;
+}
+
+/* Stock prediction badges */
+.badge-prediction-low {
+    background-color: #dc3545 !important;
+}
+.badge-prediction-medium {
+    background-color: #fd7e14 !important;
+}
+.badge-prediction-high {
+    background-color: #28a745 !important;
+}
+.badge-prediction-infinite {
+    background-color: #6c757d !important;
+}
+
+/* Sales page styles */
+.card-header {
+    border-radius: 15px 15px 0 0;
+    font-weight: 600;
+}
+
+.table-container h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.bg-primary, .bg-success {
+    border-radius: 15px;
+}

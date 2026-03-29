@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Inventory System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h1 class="text-center"><i class="fas fa-tachometer-alt me-3"></i>Analytics Dashboard</h1>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm border-0 h-100 bg-success text-white">
+            <div class="card-body text-center p-4">
+                <i class="fas fa-boxes fa-3x mb-3 opacity-75"></i>
+                <h2>{{ analytics.total_products }}</h2>
+                <p class="card-title mb-0">Total Products</p>
+            </div>
+        </div>
+    </div>
+    
+        <div class="col-md-3 mb-4">
+        <div class="card shadow-sm border-0 h-100 bg-primary text-white">
+            <div class="card-body text-center p-4">
+                <i class="fas fa-shopping-cart fa-3x mb-3 opacity-75"></i>
+                <h2>{{ analytics.total_sales_qty }}</h2>
+                <p class="card-title mb-0">Total Units Sold</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm border-0 h-100 bg-warning text-dark">
+            <div class="card-body text-center p-4">
+                <i class="fas fa-bolt fa-3x mb-3"></i>
+                <h4 class="mb-1">{{ analytics.fastest_product }}</h4>
+                <p class="card-title mb-0">Fastest Selling</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm border-0 h-100 bg-danger text-white">
+            <div class="card-body text-center p-4">
+                <i class="fas fa-exclamation-triangle fa-3x mb-3 opacity-75"></i>
+                <h4 class="mb-1">{{ analytics.dead_stock }}</h4>
+                <p class="card-title mb-0">Dead Stock</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm border-0 h-100 bg-purple text-white">
+            <div class="card-body text-center p-4">
+                <i class="fas fa-brain fa-3x mb-3 opacity-75"></i>
+                <h4>ML Predicted Demand (30 days): {{ analytics.ml_predicted_demand }} units</h4>
+                <p class="card-title mb-0">Powered by Linear Regression</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if alerts %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h3><i class="fas fa-bell me-2 text-warning"></i>Smart Alerts</h3>
+        {% for alert in alerts %}
+        <div class="alert alert-{{ alert.type }} alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            {{ alert.message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Data Insights Section (Research) -->
+<div class="row mt-4">
+    <div class="col-12">
+        <h3><i class="fas fa-chart-bar me-2 text-info"></i>Research Insights</h3>
+        <div class="row">
+            {% for insight in analytics.insights %}
+            <div class="col-md-6 mb-3">
+                <div class="alert alert-info">
+                    {{ insight }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- ML Comparison Table -->
+<div class="row mt-4">
+    <div class="col-12">
+        <h3><i class="fas fa-table me-2 text-success"></i>Actual vs Predicted Sales Comparison</h3>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Actual</th>
+                        <th>ML Predicted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in analytics.ml_comparison[:10] %}
+                    <tr>
+                        <td><strong>{{ item.day }}</strong></td>
+                        <td>{{ item.actual or 'N/A' }}</td>
+                        <td><span class="badge bg-primary">{{ item.predicted or 'Future' }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Sales Trend Chart -->
+{% if analytics.chart_url %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h3><i class="fas fa-chart-line me-2 text-primary"></i>ML Sales Trend: Actual vs Forecast</h3>
+        <div class="chart-container text-center">
+            <img src="data:image/png;base64,{{ analytics.chart_url }}" alt="ML Sales Trend Chart" class="img-fluid rounded shadow">
+        </div>
+        <small class="text-muted">Blue line: Actual daily sales | Dashed red: ML 30-day forecast</small>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mt-5">
+    <div class="col-12">
+    <a href="/" class="btn btn-secondary me-3"><i class="fas fa-arrow-left me-2"></i>Back to Home</a>
+        <a href="/products" class="btn btn-success me-3"><i class="fas fa-boxes me-2"></i>Products</a>
+        <a href="/sales" class="btn btn-primary me-3"><i class="fas fa-shopping-cart me-2"></i>Sales</a>
+        <a href="/generate_dummy_data" class="btn btn-info"><i class="fas fa-database me-2"></i>Generate Test Data</a>
+    </div>
+</div>
+{% endblock %}
+
