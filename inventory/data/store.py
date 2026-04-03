@@ -3,8 +3,30 @@ from __future__ import annotations
 from datetime import datetime
 
 PRODUCTS = [
-    {"id": 1, "name": "Product A", "stock": 50, "price": 29.99, "expiry_date": "2026-03-30"},
-    {"id": 2, "name": "Product B", "stock": 30, "price": 19.99, "expiry_date": "2026-03-25"},
+    {
+        "id": 1,
+        "name": "Product A",
+        "stock": 120,
+        "price": 29.99,
+        "cost_price": 18.0,
+        "expiry_date": "2026-03-30",
+    },
+    {
+        "id": 2,
+        "name": "Product B",
+        "stock": 10,
+        "price": 19.99,
+        "cost_price": 12.0,
+        "expiry_date": "2026-03-25",
+    },
+    {
+        "id": 3,
+        "name": "Product C",
+        "stock": 0,
+        "price": 39.99,
+        "cost_price": 24.0,
+        "expiry_date": "2026-06-15",
+    },
 ]
 
 SALES_DATA = [
@@ -41,24 +63,33 @@ def append_sale(product_id: int, product_name: str, qty: int, unit_price: float)
     )
 
 
-def add_product(name: str, stock: int, price: float, expiry_date: str = "2026-12-31") -> None:
+def add_product(
+    name: str,
+    stock: int,
+    price: float,
+    cost_price: float | None = None,
+    expiry_date: str = "2026-12-31",
+) -> None:
+    resolved_cost = cost_price if cost_price is not None else round(price * 0.6, 2)
     PRODUCTS.append(
         {
             "id": len(PRODUCTS) + 1,
             "name": name,
             "stock": stock,
             "price": price,
+            "cost_price": resolved_cost,
             "expiry_date": expiry_date,
         }
     )
 
 
-def update_product(pid: int, name: str, stock: int, price: float) -> bool:
+def update_product(pid: int, name: str, stock: int, price: float, cost_price: float | None = None) -> bool:
     for item in PRODUCTS:
         if item["id"] == pid:
             item["name"] = name
             item["stock"] = stock
             item["price"] = price
+            item["cost_price"] = cost_price if cost_price is not None else item.get("cost_price", round(price * 0.6, 2))
             return True
     return False
 

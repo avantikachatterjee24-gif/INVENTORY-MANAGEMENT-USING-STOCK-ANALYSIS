@@ -37,8 +37,9 @@ def sales_route():
         product_id = int(request.form["product_id"])
         qty = int(request.form["qty"])
         product = next((item for item in PRODUCTS if item["id"] == product_id), None)
-        if product and qty > 0:
+        if product and qty > 0 and int(product.get("stock", 0)) >= qty:
             append_sale(product_id, product["name"], qty, float(product["price"]))
+            product["stock"] = int(product.get("stock", 0)) - qty
         return redirect(url_for("main.sales_route"))
 
     return render_template(
@@ -54,8 +55,9 @@ def add_product_route():
     name = request.form.get("name", "").strip()
     stock = int(request.form.get("stock", 0))
     price = float(request.form.get("price", 0.0))
+    cost_price = float(request.form.get("cost_price", round(price * 0.6, 2)))
     if name:
-        add_product(name=name, stock=stock, price=price)
+        add_product(name=name, stock=stock, price=price, cost_price=cost_price)
     return redirect(url_for("main.products_page"))
 
 
@@ -65,8 +67,9 @@ def update_product_route():
     name = request.form.get("name", "").strip()
     stock = int(request.form.get("stock", 0))
     price = float(request.form.get("price", 0.0))
+    cost_price = float(request.form.get("cost_price", round(price * 0.6, 2)))
     if name:
-        update_product(pid=pid, name=name, stock=stock, price=price)
+        update_product(pid=pid, name=name, stock=stock, price=price, cost_price=cost_price)
     return redirect(url_for("main.products_page"))
 
 
