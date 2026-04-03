@@ -71,7 +71,7 @@
                 <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Add New Product</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="/add_product" method="POST">
+            <form action="{{ url_for('main.add_product_route') }}" method="POST">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Product Name</label>
@@ -154,7 +154,7 @@ function editProduct(id, name, stock, price) {
 document.getElementById('editForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const formData = new FormData(this);
-    fetch('/update_product', {
+    fetch('{{ url_for('main.update_product_route') }}', {
         method: 'POST',
         body: formData
     }).then(() => {

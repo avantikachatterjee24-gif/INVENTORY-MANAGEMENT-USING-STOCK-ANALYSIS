@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    stock INTEGER NOT NULL,
+    price REAL NOT NULL,
+    expiry_date TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS sales (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL,
+    qty INTEGER NOT NULL,
+    total REAL NOT NULL,
+    timestamp TEXT NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
