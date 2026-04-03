@@ -6,12 +6,13 @@ from datetime import datetime
 from io import BytesIO
 
 import matplotlib
+import numpy as np
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from inventory.data.store import PRODUCTS, SALES_DATA
-from inventory.ml.demand_model import predict_demand
+from inventory.ml.demand_model import predict_demand, predict_all_products, train_and_predict
 
 
 
@@ -142,21 +143,51 @@ def stock_pie_chart() -> str:
 
 
 
+def regression_chart(product_id: int, days_ahead: int, result: dict) -> str:
+    """Generate a regression line chart for the given product prediction result."""
+    x_train = result["x_train"]
+    y_train = result["y_train"]
+    x_future = result["x_future"]
+    predicted = result["predicted_units"]
+
+    plt.figure(figsize=(8, 4.5))
+    plt.scatter(x_train, y_train, color="#2563eb", zorder=5, label="Actual Sales", s=60)
+
+    if result["slope"] is not None and len(x_train) >= 2:
+        x_range = np.linspace(min(x_train), x_future, 200)
+        y_line = result["slope"] * x_range + result["intercept"]
+        plt.plot(x_range, y_line, color="#7c3aed", linewidth=2, label="Regression Line")
+
+    if x_future is not None and predicted is not None:
+        plt.scatter(
+            [x_future], [predicted],
+            color="#ef4444", zorder=6, s=100,
+            marker="*", label=f"Predicted (+{days_ahead}d): {predicted} units"
+        )
+
+    plt.title("Demand Prediction – Linear Regression")
+    plt.xlabel("Day Index (days since first sale)")
+    plt.ylabel("Units Sold")
+    plt.legend()
+    plt.grid(alpha=0.2)
+    return _figure_to_base64()
+
+
 def dashboard_payload() -> dict:
     financials = profit_loss_analysis()
     line_chart = sales_line_chart()
+    ml_predictions = predict_all_products(SALES_DATA, PRODUCTS, days_ahead=30)
     return {
         "total_products": len(PRODUCTS),
         "total_sales_qty": sum(int(item.get("qty", 0)) for item in SALES_DATA),
         "total_revenue": sum(float(item.get("total", 0.0)) for item in SALES_DATA),
         "fastest_product": PRODUCTS[0]["name"] if PRODUCTS else "N/A",
         "dead_stock": len([p for p in PRODUCTS if int(p.get("stock", 0)) == 0]),
-        "ml_predicted_demand": predict_demand(SALES_DATA),
+        "ml_predictions": ml_predictions,
         "insights": [
             f"Stock Report generated for {len(PRODUCTS)} products",
             f"Current {financials['status']}: INR {abs(financials['profit']):.2f}",
         ],
-        "ml_comparison": [{"day": "Day 1", "actual": 5, "predicted": 6}],
         "chart_url": line_chart,
         "stock_status": stock_status_report(),
         "financials": financials,

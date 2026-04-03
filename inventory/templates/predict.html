@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Demand Predictor – Inventory System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12 text-center">
+    <h1 class="fw-bold"><i class="fas fa-brain me-3 text-purple"></i>Demand Predictor</h1>
+    <p class="text-muted mt-2">Uses <strong>Linear Regression</strong> trained on your past sales to forecast future demand.</p>
+  </div>
+</div>
+
+<!-- Input Form -->
+<div class="row justify-content-center mb-5">
+  <div class="col-md-7">
+    <div class="card shadow border-0" style="border-radius:16px; background: linear-gradient(135deg,#f8f9ff,#eef2ff);">
+      <div class="card-body p-4">
+        <h5 class="fw-semibold mb-3"><i class="fas fa-sliders-h me-2 text-primary"></i>Configure Prediction</h5>
+        <form method="POST" action="{{ url_for('main.predict_route') }}" id="predict-form">
+          <div class="mb-3">
+            <label for="product_id" class="form-label fw-semibold">Select Product</label>
+            <select class="form-select form-select-lg" name="product_id" id="product_id" required>
+              <option value="" disabled {% if not selected_product_id %}selected{% endif %}>-- Choose a product --</option>
+              {% for p in products %}
+              <option value="{{ p.id }}" {% if selected_product_id == p.id %}selected{% endif %}>
+                {{ p.name }} (Stock: {{ p.stock }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label for="days_ahead" class="form-label fw-semibold">Days Ahead to Predict</label>
+            <input
+              type="number"
+              class="form-control form-control-lg"
+              id="days_ahead"
+              name="days_ahead"
+              value="{{ days_ahead }}"
+              min="1" max="365"
+              placeholder="e.g. 30"
+              required
+            >
+            <div class="form-text text-muted">How many days into the future do you want to forecast? (1–365)</div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w-100" id="predict-btn">
+            <i class="fas fa-magic me-2"></i>Run Prediction
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Results Section -->
+{% if result is not none %}
+<div class="row justify-content-center">
+  <div class="col-md-10">
+
+    {% if result.predicted_units is none %}
+    <!-- Not enough data -->
+    <div class="alert alert-warning d-flex align-items-center shadow-sm" role="alert" style="border-radius:12px;">
+      <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+      <div>
+        <strong>Cannot Predict:</strong> {{ result.message }}<br>
+        <small class="text-muted">Data points available: <strong>{{ result.data_points }}</strong>. Record at least 2 sales for this product and try again.</small>
+      </div>
+    </div>
+
+    {% else %}
+    <!-- Success: show prediction cards -->
+    <h4 class="fw-bold mb-4"><i class="fas fa-chart-line me-2 text-success"></i>Prediction Results</h4>
+
+    <div class="row g-3 mb-4">
+      <!-- Predicted Units -->
+      <div class="col-md-3">
+        <div class="card text-center border-0 shadow h-100" style="border-radius:14px; background:linear-gradient(135deg,#6d28d9,#7c3aed); color:white;">
+          <div class="card-body py-4">
+            <i class="fas fa-box-open fa-2x mb-2 opacity-75"></i>
+            <div class="display-5 fw-bold">{{ result.predicted_units }}</div>
+            <div class="small mt-1 opacity-90">Predicted Units</div>
+            <div class="small opacity-75">in {{ days_ahead }} days</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggested Reorder -->
+      <div class="col-md-3">
+        <div class="card text-center border-0 shadow h-100" style="border-radius:14px; background:linear-gradient(135deg,#059669,#10b981); color:white;">
+          <div class="card-body py-4">
+            <i class="fas fa-truck-loading fa-2x mb-2 opacity-75"></i>
+            <div class="display-5 fw-bold">{{ (result.predicted_units * 1.1) | int }}</div>
+            <div class="small mt-1 opacity-90">Suggested Reorder</div>
+            <div class="small opacity-75">+10% safety buffer</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- R² Score -->
+      <div class="col-md-3">
+        <div class="card text-center border-0 shadow h-100" style="border-radius:14px; background:linear-gradient(135deg,#0369a1,#0ea5e9); color:white;">
+          <div class="card-body py-4">
+            <i class="fas fa-ruler-combined fa-2x mb-2 opacity-75"></i>
+            <div class="display-5 fw-bold">{{ "%.2f"|format(result.r2_score) }}</div>
+            <div class="small mt-1 opacity-90">R² Score</div>
+            <div class="small opacity-75">Model accuracy</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Points -->
+      <div class="col-md-3">
+        <div class="card text-center border-0 shadow h-100" style="border-radius:14px; background:linear-gradient(135deg,#b45309,#f59e0b); color:white;">
+          <div class="card-body py-4">
+            <i class="fas fa-database fa-2x mb-2 opacity-75"></i>
+            <div class="display-5 fw-bold">{{ result.data_points }}</div>
+            <div class="small mt-1 opacity-90">Training Days</div>
+            <div class="small opacity-75">Historical records</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Model Details -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+      <div class="card-body p-4">
+        <h6 class="fw-semibold mb-3"><i class="fas fa-info-circle me-2 text-secondary"></i>Model Details</h6>
+        <div class="row text-center">
+          <div class="col-md-4">
+            <div class="small text-muted">Slope (units/day)</div>
+            <div class="h5 fw-bold text-primary">{{ result.slope }}</div>
+          </div>
+          <div class="col-md-4">
+            <div class="small text-muted">Intercept</div>
+            <div class="h5 fw-bold text-secondary">{{ result.intercept }}</div>
+          </div>
+          <div class="col-md-4">
+            <div class="small text-muted">Days from first sale to forecast</div>
+            <div class="h5 fw-bold text-dark">{{ result.x_future }}</div>
+          </div>
+        </div>
+        {% if result.r2_score < 0.5 %}
+        <div class="alert alert-warning mt-3 mb-0 py-2" style="border-radius:8px;">
+          <i class="fas fa-info-circle me-1"></i>
+          <small>Low R² score — consider recording more sales data for a better fit.</small>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Regression Chart -->
+    {% if chart_b64 %}
+    <div class="card border-0 shadow-sm" style="border-radius:14px;">
+      <div class="card-body p-4">
+        <h6 class="fw-semibold mb-3"><i class="fas fa-chart-line me-2 text-primary"></i>Regression Chart</h6>
+        <img src="data:image/png;base64,{{ chart_b64 }}" alt="Linear Regression Chart" class="img-fluid rounded" style="max-height:420px; width:100%; object-fit:contain;">
+        <p class="text-muted small mt-2 mb-0">
+          <i class="fas fa-circle text-primary me-1" style="font-size:10px;"></i>Blue dots = actual sales &nbsp;
+          <i class="fas fa-minus" style="color:#7c3aed;"></i> Purple line = regression fit &nbsp;
+          <span style="color:#ef4444;">★</span> Red star = predicted demand
+        </p>
+      </div>
+    </div>
+    {% endif %}
+    {% endif %}
+
+  </div>
+</div>
+{% endif %}
+
+<!-- Navigation -->
+<div class="row mt-5">
+  <div class="col-12">
+    <a href="{{ url_for('main.home') }}" class="btn btn-secondary me-2"><i class="fas fa-arrow-left me-2"></i>Home</a>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-primary me-2"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+    <a href="{{ url_for('main.sales_route') }}" class="btn btn-outline-success"><i class="fas fa-shopping-cart me-2"></i>Record Sales</a>
+  </div>
+</div>
+
+{% endblock %}

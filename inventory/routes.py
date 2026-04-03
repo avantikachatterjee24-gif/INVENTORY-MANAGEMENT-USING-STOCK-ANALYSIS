@@ -10,7 +10,8 @@ from inventory.data.store import (
     delete_product,
     update_product,
 )
-from inventory.services.analytics import dashboard_payload, product_days_left, sales_stats
+from inventory.ml.demand_model import train_and_predict
+from inventory.services.analytics import dashboard_payload, product_days_left, regression_chart, sales_stats
 
 main_bp = Blueprint("main", __name__)
 
@@ -82,3 +83,27 @@ def delete_product_route(pid: int):
 @main_bp.route("/generate_dummy_data")
 def generate_dummy_data():
     return redirect(url_for("main.dashboard"))
+
+
+@main_bp.route("/predict", methods=["GET", "POST"])
+def predict_route():
+    result = None
+    chart_b64 = None
+    selected_product_id = None
+    days_ahead = 30
+
+    if request.method == "POST":
+        selected_product_id = int(request.form.get("product_id", 0))
+        days_ahead = max(1, min(365, int(request.form.get("days_ahead", 30))))
+        result = train_and_predict(SALES_DATA, selected_product_id, days_ahead)
+        if result["predicted_units"] is not None:
+            chart_b64 = regression_chart(selected_product_id, days_ahead, result)
+
+    return render_template(
+        "predict.html",
+        products=PRODUCTS,
+        result=result,
+        chart_b64=chart_b64,
+        selected_product_id=selected_product_id,
+        days_ahead=days_ahead,
+    )

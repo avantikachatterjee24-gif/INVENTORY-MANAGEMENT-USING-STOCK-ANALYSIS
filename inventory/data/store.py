@@ -30,22 +30,28 @@ PRODUCTS = [
 ]
 
 SALES_DATA = [
-    {
-        "id": 1,
-        "product_id": 1,
-        "product_name": "Product A",
-        "qty": 5,
-        "total": 149.95,
-        "timestamp": "2024-10-15 10:30",
-    },
-    {
-        "id": 2,
-        "product_id": 2,
-        "product_name": "Product B",
-        "qty": 3,
-        "total": 59.97,
-        "timestamp": "2024-10-16 14:20",
-    },
+    # Product A sales — spread over multiple days
+    {"id": 1,  "product_id": 1, "product_name": "Product A", "qty": 5,  "total": 149.95, "timestamp": "2024-10-01 09:00"},
+    {"id": 2,  "product_id": 1, "product_name": "Product A", "qty": 8,  "total": 239.92, "timestamp": "2024-10-05 11:00"},
+    {"id": 3,  "product_id": 1, "product_name": "Product A", "qty": 6,  "total": 179.94, "timestamp": "2024-10-10 14:00"},
+    {"id": 4,  "product_id": 1, "product_name": "Product A", "qty": 10, "total": 299.90, "timestamp": "2024-10-15 10:30"},
+    {"id": 5,  "product_id": 1, "product_name": "Product A", "qty": 9,  "total": 269.91, "timestamp": "2024-10-20 16:00"},
+    {"id": 6,  "product_id": 1, "product_name": "Product A", "qty": 12, "total": 359.88, "timestamp": "2024-10-25 09:45"},
+    {"id": 7,  "product_id": 1, "product_name": "Product A", "qty": 11, "total": 329.89, "timestamp": "2024-10-30 13:00"},
+
+    # Product B sales — spread over multiple days
+    {"id": 8,  "product_id": 2, "product_name": "Product B", "qty": 3,  "total": 59.97,  "timestamp": "2024-10-02 10:00"},
+    {"id": 9,  "product_id": 2, "product_name": "Product B", "qty": 5,  "total": 99.95,  "timestamp": "2024-10-08 12:00"},
+    {"id": 10, "product_id": 2, "product_name": "Product B", "qty": 4,  "total": 79.96,  "timestamp": "2024-10-14 15:00"},
+    {"id": 11, "product_id": 2, "product_name": "Product B", "qty": 7,  "total": 139.93, "timestamp": "2024-10-20 11:30"},
+    {"id": 12, "product_id": 2, "product_name": "Product B", "qty": 6,  "total": 119.94, "timestamp": "2024-10-26 09:00"},
+
+    # Product C sales — spread over multiple days
+    {"id": 13, "product_id": 3, "product_name": "Product C", "qty": 2,  "total": 79.98,  "timestamp": "2024-10-03 08:30"},
+    {"id": 14, "product_id": 3, "product_name": "Product C", "qty": 4,  "total": 159.96, "timestamp": "2024-10-12 10:00"},
+    {"id": 15, "product_id": 3, "product_name": "Product C", "qty": 3,  "total": 119.97, "timestamp": "2024-10-18 14:30"},
+    {"id": 16, "product_id": 3, "product_name": "Product C", "qty": 5,  "total": 199.95, "timestamp": "2024-10-24 16:00"},
+    {"id": 17, "product_id": 3, "product_name": "Product C", "qty": 6,  "total": 239.94, "timestamp": "2024-10-29 11:00"},
 ]
 
 
