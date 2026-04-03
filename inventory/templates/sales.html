@@ -4,12 +4,11 @@
 
 {% block content %}
 <div class="row">
-    <!-- Stats Cards -->
-        <div class="col-md-3 mb-4">
+    <div class="col-md-3 mb-4">
         <div class="card shadow-sm border-0 h-100 text-center bg-primary text-white">
             <div class="card-body p-4">
                 <i class="fas fa-shopping-cart fa-3x mb-3"></i>
-{{ stats.total_sales|int|default(0) }}
+                <h3>{{ stats.total_sales|int|default(0) }}</h3>
                 <p class="mb-0">Total Units Sold</p>
             </div>
         </div>
@@ -18,31 +17,19 @@
         <div class="card shadow-sm border-0 h-100 text-center bg-success text-white">
             <div class="card-body p-4">
                 <i class="fas fa-dollar-sign fa-3x mb-3"></i>
-₹{{ "%.2f"|format(stats.total_revenue|float|default(0)) }}
+                <h3>₹{{ "%.2f"|format(stats.total_revenue|float|default(0)) }}</h3>
                 <p class="mb-0">Total Revenue</p>
             </div>
         </div>
     </div>
-    
-    <!-- Record Sale Card -->
+
     <div class="col-md-6 mb-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-light">
                 <h5><i class="fas fa-plus-circle me-2"></i>Record New Sale</h5>
             </div>
-action="{{ url_for('sales') }}"
+            <form action="{{ url_for('main.sales_route') }}" method="POST">
                 <div class="card-body">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-                    
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Product</label>
@@ -50,14 +37,14 @@ action="{{ url_for('sales') }}"
                                 <option value="">Select Product</option>
                                 {% for product in products %}
                                 <option value="{{ product.id }}" data-stock="{{ product.stock }}" data-price="{{ product.price }}">
-₹{{ "%.2f"|format(product.price|float|default(0)) }}
+                                    {{ product.name }} - ₹{{ "%.2f"|format(product.price|float|default(0)) }}
                                 </option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Quantity</label>
-    <input type="number" class="form-control" name="qty" min="1" required>
+                            <input type="number" class="form-control" name="qty" min="1" required>
                         </div>
                         <div class="col-md-3 mb-3 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100">
@@ -71,7 +58,6 @@ action="{{ url_for('sales') }}"
     </div>
 </div>
 
-<!-- Sales History Table -->
 <div class="row">
     <div class="col-12">
         <div class="table-container">
@@ -96,7 +82,7 @@ action="{{ url_for('sales') }}"
                             <td>
                                 <span class="badge bg-info">{{ sale.qty }}</span>
                             </td>
-{{ "%.2f"|format(sale.total|float|default(0)) }}
+                            <td>₹{{ "%.2f"|format(sale.total|float|default(0)) }}</td>
                             <td>{{ sale.timestamp }}</td>
                         </tr>
                         {% endfor %}
@@ -113,13 +99,4 @@ action="{{ url_for('sales') }}"
         </div>
     </div>
 </div>
-
-<script>
-document.querySelector('select[name="product_id"]').addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    if (selectedOption.value) {
-        console.log('Stock:', selectedOption.dataset.stock);
-    }
-});
-</script>
 {% endblock %}
